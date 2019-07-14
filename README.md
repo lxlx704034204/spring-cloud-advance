@@ -1,5 +1,5 @@
 # spring-cloud-advance  祥述：https://mp.weixin.qq.com/s/nQtkqN9IwZek6LX1Bvgf6A
- @ControllerAdvice+@ExceptionHandler全局处理Controller层异常 消灭95%以上的 try catch 
+ @ControllerAdvice + @ExceptionHandler全局处理Controller层异常 消灭95%以上的 try catch 
  
    * @ExceptionHandler：统一处理某一类异常，从而能够减少代码重复率和复杂度
    * @ControllerAdvice：异常集中处理，更好的使业务逻辑与异常处理剥离开
