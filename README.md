@@ -1,6 +1,10 @@
 # spring-cloud-advance
  @ControllerAdvice+@ExceptionHandler全局处理Controller层异常 消灭95%以上的 try catch 
-   UnifiedExceptionHandler:
+   * @ExceptionHandler：统一处理某一类异常，从而能够减少代码重复率和复杂度
+   * @ControllerAdvice：异常集中处理，更好的使业务逻辑与异常处理剥离开
+   * @ResponseStatus：可以将某种异常映射为HTTP状态码
+   
+   UnifiedExceptionHandler.class 全局异常处理器:
     	BusinessException.class	业务异常
     	BaseException.class		自定义异常
     	BindException.class		参数绑定异常	
