@@ -37,7 +37,7 @@ public class ResponseInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(ResponseInterceptor.class);
 
-    @Around("execution(* com.sprainkle.ueh.licence.controllerTest..*Controller.*(..))")
+    @Around("execution(* com.sprainkle.ueh.licence.controllerTest..*Controller.*(..)) && !execution(* com.sprainkle.ueh.licence.controller..*Controller.*(..))")
     public Object responseHandle(ProceedingJoinPoint pjp) {
         QR response = new QR();
 

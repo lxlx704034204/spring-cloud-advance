@@ -32,6 +32,11 @@ public class LicenceController {
     @Autowired
     private LicenceService licenceService;
 
+    /**
+     * R: 后端给前端返回的固定的数据格式model
+     * @param licenceId
+     * @return
+     */
     @GetMapping(value = "/{licenceId}")
     public R<LicenceDTO> getLicence(@PathVariable("licenceId") Long licenceId) {
         return new R<>(licenceService.queryDetail(licenceId));

@@ -16,6 +16,9 @@ giHELP.md
 *.iws
 *.iml
 *.ipr
+*.log
+*.log.*
+target/
 
 ### NetBeans ###
 /nbproject/private/

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient("ueh-organization")
 public interface OrganizationClient {
 
+    // ueh-organization
     @GetMapping("/organization/{organizationId}")
     R<OrganizationDTO> getOrganization(@PathVariable("organizationId") Long organizationId);
 

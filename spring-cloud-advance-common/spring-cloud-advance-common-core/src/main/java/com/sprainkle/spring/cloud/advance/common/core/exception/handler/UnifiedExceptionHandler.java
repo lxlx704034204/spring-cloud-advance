@@ -48,7 +48,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @ConditionalOnMissingBean(UnifiedExceptionHandler.class)
 public class UnifiedExceptionHandler {
     /**
-     * 生产环境
+     * 生产环境BusinessException
      */
     private final static String ENV_PROD = "prod";
 

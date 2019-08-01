@@ -1,9 +1,13 @@
 # spring-cloud-advance  祥述：https://mp.weixin.qq.com/s/nQtkqN9IwZek6LX1Bvgf6A
+
+# Springboot Web层以AOP注解的方式进行接口参数统一校验 ValidationBean.class   ResponseInterceptor
+
+# 概述
  @ControllerAdvice + @ExceptionHandler全局处理Controller层异常 消灭95%以上的 try catch 
  
-   * @ExceptionHandler：统一处理某一类异常，从而能够减少代码重复率和复杂度
-   * @ControllerAdvice：异常集中处理，更好的使业务逻辑与异常处理剥离开
-   * @ResponseStatus：可以将某种异常映射为HTTP状态码
+   * @ExceptionHandler：统一处理某一类异常，从而能够减少代码重复率和复杂度  UnifiedExceptionHandler.class中各类型异常标识 
+   * @ControllerAdvice：异常集中处理，更好的使业务逻辑与异常处理剥离开      UnifiedExceptionHandler.class
+   * @ResponseStatus：可以将某种异常映射为HTTP状态码                       
    
    UnifiedExceptionHandler.class 全局异常处理器:
     	BusinessException.class	业务异常
@@ -41,7 +45,7 @@
      服务A注册了就可以对外提供Eureka接口
      服务B注册了就可以对外提供Eureka接口.......
  
- #数据源的配置
+ #简易数据源配置[不需要连接db]
  spring:
    datasource:
      platform: h2
