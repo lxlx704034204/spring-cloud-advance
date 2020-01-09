@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,10 @@ import org.springframework.web.context.request.async.AsyncRequestTimeoutExceptio
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.Set;
+
 /**
  * <p>全局异常处理器</p>
  *
@@ -54,29 +59,75 @@ public class UnifiedExceptionHandler {
 
     @Autowired
     private UnifiedMessageSource unifiedMessageSource;
-
     /**
      * 当前环境
      */
     @Value("${spring.profiles.active}")
     private String profile;
 
+
     /**
-     * 获取国际化消息
+     * 自定义异常  https://segmentfault.com/a/1190000017782778
+     * <p>
+     * BaseException extends RuntimeException
      *
      * @param e 异常
-     * @return
+     * @return 异常结果
      */
-    public String getMessage(BaseException e) {
-        String code = "response." + e.getResponseEnum().toString();
-        String message = unifiedMessageSource.getMessage(code, e.getArgs());
+    @ExceptionHandler(value = BaseException.class)
+    @ResponseBody
+    public ErrorResponse handleBaseException(BaseException e) {
+        log.error(e.getMessage(), e);
 
-        if (message == null || message.isEmpty()) {
-            return e.getMessage();
+        return new ErrorResponse(e.getResponseEnum().getCode(), getMessage(e));
+    }
+
+    /**
+     * 未定义异常
+     *
+     * @param e 异常
+     * @return 异常结果
+     */
+    @ExceptionHandler(value = Exception.class)
+    @ResponseBody
+    public ErrorResponse handleException(Exception e) {
+        log.error(e.getMessage(), e);
+
+        if (ENV_PROD.equals(profile)) {
+            // 当为生产环境, 不适合把具体的异常信息展示给用户, 比如数据库异常信息.
+            int code = CommonResponseEnum.SERVER_ERROR.getCode();
+            BaseException baseException = new BaseException(CommonResponseEnum.SERVER_ERROR);
+            String message = getMessage(baseException);
+            return new ErrorResponse(code, message);
         }
 
-        return message;
+        return new ErrorResponse(CommonResponseEnum.SERVER_ERROR.getCode(), e.getMessage());
     }
+    //// https://blog.csdn.net/bowei026/article/details/84260958
+    //// https://www.cnblogs.com/zhenghengbin/p/11137751.html
+//    @ExceptionHandler(Exception.class)
+//    @ResponseBody
+//    public R handleException(Exception e) {
+//        log.error(e.getMessage(), e);
+//        BindingResult result = null;
+//        if (e instanceof MethodArgumentNotValidException) {
+//            result = ((MethodArgumentNotValidException) e).getBindingResult();
+//        } else if (e instanceof BindException) {
+//            result = ((BindException) e).getBindingResult();
+//        } else if (e instanceof ConstraintViolationException) {
+//            Set<ConstraintViolation<?>> constraintViolations = ((ConstraintViolationException) e).getConstraintViolations();
+//            for (ConstraintViolation<?> violation : constraintViolations) {
+//                return R.error(HttpStatus.BAD_REQUEST.value(), violation.getMessage());
+//            }
+//        }
+//        if (result != null) {
+//            for (ObjectError error : result.getAllErrors()) {
+//                return R.error(HttpStatus.BAD_REQUEST.value(), error.getDefaultMessage());
+//            }
+//        }
+//        return R.error(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+//    }
+
 
     /**
      * 业务异常
@@ -87,20 +138,6 @@ public class UnifiedExceptionHandler {
     @ExceptionHandler(value = BusinessException.class)
     @ResponseBody
     public ErrorResponse handleBusinessException(BaseException e) {
-        log.error(e.getMessage(), e);
-
-        return new ErrorResponse(e.getResponseEnum().getCode(), getMessage(e));
-    }
-
-    /**
-     * 自定义异常
-     *
-     * @param e 异常
-     * @return 异常结果
-     */
-    @ExceptionHandler(value = BaseException.class)
-    @ResponseBody
-    public ErrorResponse handleBaseException(BaseException e) {
         log.error(e.getMessage(), e);
 
         return new ErrorResponse(e.getResponseEnum().getCode(), getMessage(e));
@@ -201,26 +238,21 @@ public class UnifiedExceptionHandler {
         return new ErrorResponse(ArgumentResponseEnum.VALID_ERROR.getCode(), msg.substring(2));
     }
 
+
     /**
-     * 未定义异常
+     * 获取国际化消息
      *
      * @param e 异常
-     * @return 异常结果
+     * @return
      */
-    @ExceptionHandler(value = Exception.class)
-    @ResponseBody
-    public ErrorResponse handleException(Exception e) {
-        log.error(e.getMessage(), e);
+    public String getMessage(BaseException e) {
+        String code = "response." + e.getResponseEnum().toString();
+        String message = unifiedMessageSource.getMessage(code, e.getArgs());
 
-        if (ENV_PROD.equals(profile)) {
-            // 当为生产环境, 不适合把具体的异常信息展示给用户, 比如数据库异常信息.
-            int code = CommonResponseEnum.SERVER_ERROR.getCode();
-            BaseException baseException = new BaseException(CommonResponseEnum.SERVER_ERROR);
-            String message = getMessage(baseException);
-            return new ErrorResponse(code, message);
+        if (message == null || message.isEmpty()) {
+            return e.getMessage();
         }
-
-        return new ErrorResponse(CommonResponseEnum.SERVER_ERROR.getCode(), e.getMessage());
+        return message;
     }
 
 }

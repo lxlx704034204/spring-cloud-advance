@@ -35,6 +35,62 @@ public class LicenceService extends ServiceImpl<LicenceMapper, Licence> {
     @Autowired
     private OrganizationClient organizationClient;
 
+
+
+    /**
+     *      多条事务 全局异常 回滚
+     *      如果注解上只写 @Transactional  默认只对 RuntimeException 回滚，而非 Exception 进行回滚;
+     *  如果要对 checked Exceptions 进行回滚，则需要 @Transactional(rollbackFor = Exception.class)
+     *
+     *      springboot全局异常处理(包含404错误处理) https://blog.csdn.net/q_linchao/article/details/80763353
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public LicenceAddRespData addLicence2(LicenceAddRequest request) {
+        // 省略校验参数
+        Licence licence = new Licence();
+        licence.setOrganizationId(request.getOrganizationId());
+        licence.setLicenceType(request.getLicenceType());
+        licence.setProductName(request.getProductName());
+        licence.setLicenceMax(request.getLicenceMax());
+        licence.setLicenceAllocated(request.getLicenceAllocated());
+        licence.setComment(request.getComment());
+        this.save(licence);
+
+        //自定义异常BaseException回滚
+//        if (userInfoVo != null) {
+//            //这里假设抛个自定义异常,返回结果{code:10228 msg:"用户存在！"}
+//            throw new BaseException(ResultEnum.USER_EXIST);
+//        }
+
+        // 第二个save2出现异常，全局异常回滚，从而上一级别的save不会做持久化操作！
+//        this.save2(licence);
+
+        return new LicenceAddRespData(licence.getLicenceId());
+    }
+
+
+
+    /**
+     * 新增{@link Licence}
+     * @param request 请求体
+     * @return
+     */
+    @Transactional(rollbackFor = Throwable.class)
+    public LicenceAddRespData addLicence(LicenceAddRequest request) {
+        // 省略校验参数
+        Licence licence = new Licence();
+        licence.setOrganizationId(request.getOrganizationId());
+        licence.setLicenceType(request.getLicenceType());
+        licence.setProductName(request.getProductName());
+        licence.setLicenceMax(request.getLicenceMax());
+        licence.setLicenceAllocated(request.getLicenceAllocated());
+        licence.setComment(request.getComment());
+        this.save(licence);
+
+        return new LicenceAddRespData(licence.getLicenceId());
+    }
+
+
     /**
      * 查询{@link Licence} 详情
      * @param licenceId
@@ -66,25 +122,6 @@ public class LicenceService extends ServiceImpl<LicenceMapper, Licence> {
         return new QueryData<>(page, this::toSimpleLicenceDTO);
     }
 
-    /**
-     * 新增{@link Licence}
-     * @param request 请求体
-     * @return
-     */
-    @Transactional(rollbackFor = Throwable.class)
-    public LicenceAddRespData addLicence(LicenceAddRequest request) {
-        // 省略校验参数
-        Licence licence = new Licence();
-        licence.setOrganizationId(request.getOrganizationId());
-        licence.setLicenceType(request.getLicenceType());
-        licence.setProductName(request.getProductName());
-        licence.setLicenceMax(request.getLicenceMax());
-        licence.setLicenceAllocated(request.getLicenceAllocated());
-        licence.setComment(request.getComment());
-        this.save(licence);
-
-        return new LicenceAddRespData(licence.getLicenceId());
-    }
 
     /**
      * entity -> simple dto

@@ -1,5 +1,14 @@
-# spring-cloud-advance  祥述：https://mp.weixin.qq.com/s/nQtkqN9IwZek6LX1Bvgf6A
 
+#精简版全局异常处理： https://www.jianshu.com/p/accec85b4039
+
+# spring-cloud-advance  祥述：https://mp.weixin.qq.com/s/nQtkqN9IwZek6LX1Bvgf6A
+    统一异常处理实战：
+    1、用 Assert(断言) 替换 throw exception；
+    2、每增加一种异常情况，只需增加一个枚举实例即可，再也不用每一种异常都定义一个异常类了；
+    3、如何让404也抛出异常呢，只需在properties文件中加入如下配置即可：
+    		spring.mvc.throw-exception-if-no-handler-found=true
+    		spring.resources.add-mappings=false
+    	如此，就可以异常处理器中捕获它了，然后前端只要捕获到特定的状态码，立即跳转到404页面即可。
 # Springboot Web层以AOP注解的方式进行接口参数统一校验 ValidationBean.class   ResponseInterceptor
 
 # 概述
